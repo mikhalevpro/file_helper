@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Склейка файлов</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <style>
+        .batch-table {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body class="container mt-4">
+    <h1 class="mb-4 text-danger">Склейка файлов</h1>
+    <div class="upload-section card border-danger">
+        <div class="card-header bg-danger text-white">
+            Загрузить файлы
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div>
+                    <input type="file"
+                           name="files"
+                           id="id_files"
+                           style="display: none"
+                           onchange="this.form.submit()"
+                           multiple>
+                    {% if form.files.errors %}
+                        <div class="error">
+                            {% for error in form.files.errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <label class="btn btn-outline-danger btn-lg" for="id_files">
+                        Загрузить JSON тип 1
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="batch-table card border-success">
+        <div class="card-header bg-success text-white">
+            Последние 10 пачек
+        </div>
+        <div class="card-body">
+        <a href="{% url 'all_batch' %}" class="btn btn-outline-success btn-lg">Открыть все пачки</a></td>
+
+            <table class="batch-table table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Файлы в пачке</th>
+                        <th>Тип файлов в пачке</th>
+                        <th>Дата создания пачки</th>
+                        <th>Файлов</th>
+                        <th>Открыть пачку</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for batch in batches %}
+                    <tr>
+                        <td>{% for file in batch.file_set.all %} {{ file.file_name }} <br> {% endfor %}</td>
+                        <td>
+                            <span class="badge bg-black">{{ batch.file_type.type_name }}</span>
+                              <span class="description fst-italic">{{ batch.file_type.desc }}</span>
+                        </td>
+                        <td>{{ batch.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            <span class="badge bg-secondary">
+                                {{ batch.file_set.count }}
+                            </span>
+                        </td>
+                        <td>
+                            <a class="btn btn-outline-dark" href="{% url 'batch_detail' batch_id=batch.domain_id %}">{{ batch.domain_id}}</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">
+                            Пачек нет – не кто, не сказал, что их не будет...
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

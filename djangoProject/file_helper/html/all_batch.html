@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<head>
+    <title>Все пачки</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <style>
+        .batch-table {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <a href="{% url 'main' %}" class="btn btn-primary mb-3">Перейти на главную</a>
+    <div class="table-responsive">
+        <table class="batch-table table table-striped table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th scope="col">ID пачки</th>
+                    <th scope="col">Дата создания</th>
+                    <th scope="col">Тип файлов в пачке</th>
+                    <th scope="col">Открыть пачку</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for batch in batches %}
+                <tr>
+                    <td>{{ batch.domain_id }}</td>
+                    <td>{{ batch.created_at|date:"d.m.Y H:i" }}</td>
+                    <td>
+                        <span class="badge bg-black">{{ batch.file_type.type_name }}</span>
+                        <span class="description fst-italic">{{ batch.file_type.desc }}</span>
+                    </td>
+                    <td>
+                         <a class="btn btn-outline-dark" href="{% url 'batch_detail' batch_id=batch.domain_id %}">{{ batch.domain_id}}</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center">Нет пачек</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <nav aria-label="Навигация по страницам">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Назад</span></li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link " href="?page={{ page_obj.next_page_number }}">Вперед</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled "><span class="page-link ">Вперед</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+</body>

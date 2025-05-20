@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Информация о пачке</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <style>
+        .batch-table {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="batch-table card border-success">
+    <div class="card-header bg-success text-white">
+        Информация о пачке
+    </div>
+    <div class="card-body">
+        <h2>Пачка: {{ batch.domain_id }}</h2>
+        <p>Дата создания: {{ batch.created_at|date:"Y-m-d H:i" }}</p>
+        <p>Количество файлов: {{ file_files|length }}</p>
+        <p>Тип файлов в пачке: <span class="badge bg-black">
+            {{ batch.file_type.type_name }}
+        </span>
+        </p>
+        <a href="{% url 'main' %}" class="btn btn-primary">На главную</a>
+    </div>
+</div>
+<div class="batch-table card border-success" style="min-width: min-content;">
+    <div class="card-header bg-black text-white">
+        Слитые файлы
+    </div>
+<div class="card-body">
+<table class="table">
+    <thead>
+        <tr>
+            <th>Имя файла</th>
+            <th>Фрагмент содержимого</th>
+            <th>Скачать</th>
+            <th>Удалить</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for file in merged_files %}
+            <tr>
+                <td>{{ file.file_name }}</td>
+                <td>{{ file.file_body|truncatechars:100 }}</td>
+                <td>
+                    <a href="{% url 'download_file' file_id=file.domain_id %}"
+                       class="btn btn-success">
+                        {{ file.file_name }}
+                    </a>
+                </td>
+                <td><a href="{% url 'remove_file' batch_id=batch.domain_id remove_file_id=file.domain_id %}"
+                    onclick="return confirm('Вы уверены, что хотите удалить файл «{{ file.file_name }}»?');">Удалить</a></td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="2">Нет слитых файлов</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+</div>
+<div class="batch-table card border-success">
+    <div class="card-header bg-black text-white">
+        Файлы для слияния
+    </div>
+<div class="card-body">
+<table class="table">
+        <thead>
+            <tr>
+                <th>Имя файла</th>
+                <th>Фрагмент содержимого</th>
+                <th>Скачать файл</th>
+                <th>Удалить файл из пачки</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for file in file_files %}
+                <tr>
+                    <td>{{ file.file_name }}</td>
+                    <td>{{ file.file_body|truncatechars:100 }}</td>
+                    <td><a href="{% url 'download_file' file_id=file.domain_id %}"
+                       class="btn btn-success">
+                        {{ file.file_name }}
+                    </a></td>
+                    <td><a href="{% url 'remove_file' batch_id=batch.domain_id remove_file_id=file.domain_id %}"
+                    onclick="return confirm('Вы уверены, что хотите удалить файл «{{ file.file_name }}»?');">Удалить</a></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="3">Нет неслитых файлов</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="d-flex flex-wrap gap-3 mb-3">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div>
+          <input type="file"
+                 name="file"
+                 id="id_files"
+                 style="display: none"
+                 onchange="this.form.submit()">
+          <label class="btn btn-outline-danger btn-lg" for="id_files">
+            Загрузить файл в пачку
+          </label>
+          {% if error_msg %}
+            <div class="error">{{ error_msg }}</div>
+          {% endif %}
+        </div>
+      </form>
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="merge" class="btn btn-warning btn-lg">
+          Выполнить слияние всех файлов в пачке
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+</body>

@@ -1,0 +1,8 @@
+.env
+*.pyc
+__pycache__
+*.sqlite3
+venv/
+.DS_Store
+.git/
+json_demo_func
