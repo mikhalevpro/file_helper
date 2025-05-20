@@ -8,4 +8,4 @@
 sudo docker-compose up --build
 ```
 
-Go to localhost:8000 or your_server_ip:8000 and use the JSON file in the json_demo_funct folder
+* Go to localhost:8000 or your_server_ip:8000 and use the JSON file in the json_demo_funct folder
